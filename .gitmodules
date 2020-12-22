@@ -1,3 +1,3 @@
-[submodule "rc_controller/server/lib/ws_server"]
-	path = remote_control/server/lib/ws_server/ws_server
+[submodule "ws_server"]
+	path = remote_control/server/lib/ws_server
 	url = https://github.com/Theldus/wsServer.git
