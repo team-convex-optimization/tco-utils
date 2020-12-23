@@ -1,0 +1,64 @@
+#dbgInfo {
+    display: inline-block;
+    background-color: #00000011;
+}
+
+#dbgInfo p {
+    font-size: small;
+    padding: 1px 4px 1px 4px;
+    color: gray;
+}
+
+.dbgVal {
+    background-color: #19181a;
+}
+
+.drvVal {
+    font-size: xx-large;
+}
+
+#driverInfo {
+    font-weight: bold;
+    color: #EE523E;
+    position: fixed;
+    left: 0;
+    top: 82vh;
+    bottom: 0;
+    right: 0;
+    height: 10vh;
+    width: 100vw;
+    text-align: center;
+}
+
+#driverInfo p {
+    display: inline;
+}
+
+#driverInfo p:first-of-type {
+    margin-right: 40px;
+}
+
+.ind {
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+}
+
+.ind img {
+    width: 100%;
+    height: 100%;
+}
+
+#indCenter img {
+    width: 60px;
+    height: 60px;
+}
+
+#indCenter {
+    left: calc(50vw - 30px);
+    top: calc(50vh - 30px);
+}

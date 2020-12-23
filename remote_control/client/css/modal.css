@@ -1,0 +1,51 @@
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: hsla(270, 4%, 10%, 90%);
+}
+
+.connectionModalContent {
+  background-color: hsl(270, 4%, 12%);
+  color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border: none;
+  width: 90%;
+}
+
+#txtServerAddr, #btConnect {
+  text-align: center;
+  color: #000;
+  width: 100%;
+  font-size: large;
+  padding: 5%;
+  border: none;
+}
+
+#txtServerAddr {
+  color: black;
+  font-weight: bold;
+  background-color: hsl(46, 60%, 66%);
+}
+
+#btConnect {
+  color:hsl(3, 30%, 36%);
+  font-weight: bold;
+  background-color: hsl(3, 30%, 66%);
+}
+
+#btConnect:hover {
+  color:hsl(3, 30%, 46%);
+  background-color: hsl(3, 30%, 70%);
+}
+
+#btConnect:active {
+  color:hsl(3, 30%, 26%);
+  background-color: hsl(3, 30%, 56%);
+}

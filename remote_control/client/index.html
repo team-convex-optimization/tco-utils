@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Remote Control</title>
+	<link rel="stylesheet" href="./css/main.css">
+	<link rel="stylesheet" href="./css/modal.css">
+	<link rel="stylesheet" href="./css/controller.css">
+</head>
+
+<body>
+	<!-- Connection modal -->
+	<div id="connectionModal" class="modal">
+		<div class="connectionModalContent">
+			<input type="text" id="txtServerAddr" value="ws://localhost:8080"><br>
+			<input type="button" id="btConnect" name="btConnect" value="Connect">
+		</div>
+	</div>
+	<div id="dbgInfo">
+		<p>X-axis (β): <span id="orientValX" class="dbgVal">0</span></p>
+		<p>Y-axis (γ): <span id="orientValY" class="dbgVal">0</span></p>
+		<p>Throttle (%): <span id="throttleVal" class="dbgVal">0</span></p>
+		<p>Steering (%): <span id="steeringVal" class="dbgVal">0</span></p>
+	</div>
+	<div id="indVert" class="ind">
+		<img src="./vertical_indicator.svg" alt="" srcset="">
+	</div>
+	<div id="indHorz" class="ind">
+		<img src="./horizontal_indicator.svg" alt="" srcset="">
+	</div>
+	<div id="indCenter" class="ind">
+		<img src="./center_indicator.svg" alt="" srcset="">
+	</div>
+	<div id="driverInfo">
+		<p>THRTL&emsp;<span id="throttleValDrv" class="drvVal">0</span></p>
+		<p><span id="steeringValDrv" class="drvVal">0</span>&emsp;STEER</p>
+	</div>
+</body>
+<script src="./js/modal.js"></script>
+<script src="./js/controller.js"></script>
+<script src="./js/ws.js"></script>
+<script src="./js/main.js"></script>
+
+</html>
