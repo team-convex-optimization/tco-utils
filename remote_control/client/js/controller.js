@@ -31,11 +31,15 @@ function handle_orientation(event) {
 function update_throttle(throttle) {
     document.getElementById("throttleVal").innerHTML = Math.round(throttle) + '%';
     document.getElementById("throttleValDrv").innerHTML = Math.round(throttle);
-    ws.send(`0 ${Math.round(Number(throttle.toFixed(4)) * 10000)}\n`);
+    if (connected == true) {
+        ws.send(`0 ${Math.round(Number(throttle.toFixed(4)) * 10000)}\n`);
+    }
 }
 
 function update_steering(steering) {
     document.getElementById("steeringVal").innerHTML = Math.round(steering) + '%';
     document.getElementById("steeringValDrv").innerHTML = Math.round(steering);
-    ws.send(`1 ${Math.round(Number(steering.toFixed(4)) * 10000)}\n`);
+    if (connected == true) {
+        ws.send(`1 ${Math.round(Number(steering.toFixed(4)) * 10000)}\n`);
+    }
 }
