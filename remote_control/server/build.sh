@@ -18,5 +18,5 @@ clang \
     ../code/main.c \
     ../build/libws.a \
     -lpthread \
-    -o rc-controller.bin
+    -o remote_control.bin
 popd
