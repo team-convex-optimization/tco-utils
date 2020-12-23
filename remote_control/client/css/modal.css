@@ -35,9 +35,12 @@
 }
 
 #btConnect {
+  -webkit-appearance: none; /* iOS buttons are ugly */
+  -webkit-border-radius: none;
   color:hsl(3, 30%, 36%);
   font-weight: bold;
   background-color: hsl(3, 30%, 66%);
+  border-radius: 0;
 }
 
 #btConnect:hover {

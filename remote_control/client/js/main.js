@@ -6,13 +6,13 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
     /* Connect buttom. */
     document.getElementById("btConnect").onclick = function () {
-        if (connected == false) {
+        if (ws_connected == false) {
             const address = document.getElementById("txtServerAddr").value;
             document.getElementById("btConnect").value = "Connecting...";
             ws_connect(address);
         } else {
             ws.close();
-            connected = false;
+            ws_connected = false;
         }
     };
 

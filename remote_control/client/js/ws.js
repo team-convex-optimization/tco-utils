@@ -1,5 +1,5 @@
 var ws;
-var connected = false;
+var ws_connected = false;
 
 /* Establish connection. */
 function ws_connect(addr) {
@@ -9,7 +9,7 @@ function ws_connect(addr) {
     /* Register events. */
     ws.onopen = function () {
         /* Opening connection. */
-        connected = true;
+        ws_connected = true;
         document.getElementById("btConnect").value = "Connected";
         connection_modal_show(false);
     };
@@ -24,7 +24,7 @@ function ws_connect(addr) {
     ws.onclose = function (e) {
         /* Closing connection. */
         /* e.wasClean and e.code indicate status. */
-        connected = false;
+        ws_connected = false;
         document.getElementById("btConnect").value = "Disconnected. Reconnect?";
         connection_modal_show(true);
     };
