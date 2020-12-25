@@ -13,10 +13,11 @@
 .connectionModalContent {
   background-color: hsl(270, 4%, 12%);
   color: #fff;
-  margin: 10% auto;
   padding: 20px;
   border: none;
   width: 90%;
+  margin: 20% auto;
+  max-width: 400px;
 }
 
 #txtServerAddr, #btConnect {
