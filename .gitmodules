@@ -1,4 +1,4 @@
-[submodule "ws_server"]
+[submodule "remote_control/server/lib/ws_server"]
 	path = remote_control/server/lib/ws_server
 	url = https://github.com/Theldus/wsServer.git
 [submodule "shmem_util/lib/tco_shmem"]
