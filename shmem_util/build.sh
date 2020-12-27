@@ -10,6 +10,7 @@ clang \
     -I ../code \
     -I ../lib/tco_shmem \
     -lrt \
+    -pthread \
     ../code/main.c \
     -o tco_shmem_util.bin
 popd

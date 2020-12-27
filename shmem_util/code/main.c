@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <semaphore.h>
 
 #include "tco_shmem.h"
 
@@ -60,7 +61,7 @@ void static shmem_create(void)
     for (uint16_t shmem_i = 0; shmem_i < shmem_count; shmem_i++)
     {
         printf("\n");
-        printf("Creating object '%s' of size %u\n", shmem_names[shmem_i], shmem_sizes[shmem_i]);
+        printf("Creating shared memory object '%s' of size %u\n", shmem_names[shmem_i], shmem_sizes[shmem_i]);
         int fd = shm_open(shmem_names[shmem_i], O_CREAT | O_EXCL | O_RDWR, 0666);
         if (fd == -1)
         {
@@ -76,17 +77,17 @@ void static shmem_create(void)
                     if (fstat(fd, &stat_buf) != 0)
                     {
                         perror("fstat");
-                        printf("Tried checking if the existing object is of the requested size but failed.\n");
+                        printf("Tried checking if the existing shared memory object is of the requested size but failed.\n");
                         break;
                     }
 
                     if (stat_buf.st_size == shmem_sizes[shmem_i])
                     {
-                        printf("The existing object size is equal to the requested size.\n");
+                        printf("The existing shared memory object size is equal to the requested size.\n");
                     }
                     else
                     {
-                        printf("The existing object size is NOT equal to the requested size. Remove it first then recreate it.\n");
+                        printf("The existing shared memory object size is NOT equal to the requested size. Remove it first then recreate it.\n");
                     }
                 }
                 /* When opening for readonly failed, just leave it at that i.e. error message for the first shm_open. */
@@ -103,7 +104,7 @@ void static shmem_create(void)
             }
             else
             {
-                printf("Successfully created the object\n");
+                printf("Successfully created the shared memory object\n");
             }
         }
     }
@@ -120,12 +121,63 @@ void static shmem_delete(void)
         printf("Removing object '%s'\n", shmem_names[shmem_i]);
         if (shm_unlink(shmem_names[shmem_i]) == 0)
         {
-            printf("Successfully removed the object\n");
+            printf("Successfully removed the shared memory object\n");
         }
         else
         {
             perror("shm_unlink");
-            printf("Failed to remove the object\n");
+            printf("Failed to remove the shared memory object\n");
+        }
+    }
+}
+
+void static shmem_sem_create(void)
+{
+    char *const sem_names[] = TCO_SHMEM_ARR_SEM_NAME;
+    uint16_t const sem_count = sizeof(sem_names) / sizeof(char *);
+
+    for (uint16_t sem_i = 0; sem_i < sem_count; sem_i++)
+    {
+        printf("\n");
+        printf("Creating semaphore '%s'\n", sem_names[sem_i]);
+        sem_t *sem = sem_open(sem_names[sem_i], O_CREAT | O_EXCL, 0666, 0);
+        if (sem == SEM_FAILED)
+        {
+            perror("sem_open");
+            switch (errno)
+            {
+            case EEXIST:
+                printf("Semaphore already exists.\n");
+                break;
+            default:
+                printf("Failed to create the semaphore.\n");
+                break;
+            }
+        }
+        else
+        {
+            printf("Successfully created the semaphore\n");
+        }
+    }
+}
+
+void static shmem_sem_delete(void)
+{
+    char *const sem_names[] = TCO_SHMEM_ARR_SEM_NAME;
+    uint16_t const sem_count = sizeof(sem_names) / sizeof(char *);
+
+    for (uint16_t sem_i = 0; sem_i < sem_count; sem_i++)
+    {
+        printf("\n");
+        printf("Removing semaphore '%s'\n", sem_names[sem_i]);
+        if (sem_unlink(sem_names[sem_i]) == 0)
+        {
+            printf("Successfully removed the semaphore.\n");
+        }
+        else
+        {
+            perror("sem_unlink");
+            printf("Failed to remove the semaphore.\n");
         }
     }
 }
@@ -139,12 +191,14 @@ int main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
         break;
     case CMD_CREATE:
-        printf("Creating shared memory regions.\n");
+        printf("Creating shared memory regions and their semaphores.\n");
         shmem_create();
+        shmem_sem_create();
         break;
     case CMD_DELETE:
-        printf("Deleting shared memory regions.\n");
+        printf("Deleting shared memory regions and their semaphores.\n");
         shmem_delete();
+        shmem_sem_delete();
         break;
     case CMD_HELP:
         usage_msg();
