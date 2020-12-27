@@ -4,3 +4,6 @@
 [submodule "shmem_util/lib/tco_shmem"]
 	path = shmem_util/lib/tco_shmem
 	url = https://github.com/team-convex-optimization/tco-shmem.git
+[submodule "remote_control/server/lib/tco_shmem"]
+	path = remote_control/server/lib/tco_shmem
+	url = https://github.com/team-convex-optimization/tco-shmem.git
