@@ -15,8 +15,10 @@ clang \
     -std=c11 \
     -I ../code \
     -I ../lib/ws_server/include \
+    -I ../lib/tco_shmem \
+    -lpthread \
+    -lrt \
     ../code/main.c \
     ../build/libws.a \
-    -lpthread \
     -o remote_control.bin
 popd
