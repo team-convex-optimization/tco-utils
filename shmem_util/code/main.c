@@ -104,6 +104,18 @@ void static shmem_create(void)
             }
             else
             {
+                uint8_t *valid_flag = mmap(0, shmem_sizes[shmem_i], PROT_WRITE, MAP_SHARED, fd, 0);
+                if (valid_flag == MAP_FAILED)
+                {
+                    perror("mmap");
+                    printf("Failed to set the 'valid' flag\n"); /* Not a critical error but important to notify the user. */
+                }
+                else
+                {
+                    *valid_flag = 0;
+                    printf("Set the 'valid' flag to 0 (invalid)\n");
+                }
+
                 printf("Successfully created the shared memory object\n");
             }
         }
