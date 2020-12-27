@@ -152,7 +152,7 @@ void static shmem_sem_create(void)
     {
         printf("\n");
         printf("Creating semaphore '%s'\n", sem_names[sem_i]);
-        sem_t *sem = sem_open(sem_names[sem_i], O_CREAT | O_EXCL, 0666, 0);
+        sem_t *sem = sem_open(sem_names[sem_i], O_CREAT | O_EXCL, 0666, 1);
         if (sem == SEM_FAILED)
         {
             perror("sem_open");
@@ -168,6 +168,10 @@ void static shmem_sem_create(void)
         }
         else
         {
+            if (sem_close(sem) == -1)
+            {
+                printf("Failed to close the semaphore after creation.\n"); /* Not a critical error. */
+            }
             printf("Successfully created the semaphore\n");
         }
     }
