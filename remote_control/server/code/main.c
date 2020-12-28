@@ -12,9 +12,6 @@
 #include "ws.h"
 #include "tco_shmem.h"
 
-#define SERVO_MG995_PULSE_LEN_MIN 100U /* counts */
-#define SERVO_MG995_PULSE_LEN_MAX 420U /* counts */
-
 static struct tco_shmem_data_control *control_data;
 static sem_t *control_data_sem;
 
@@ -61,8 +58,8 @@ void onmessage(int fd, const unsigned char *msg, size_t size, int type)
     free(cli);
 
     /* Parse message */
-    uint8_t channel = 0;
-    int32_t pulse_frac_raw = 0;
+    uint8_t channel;
+    int32_t pulse_frac_raw;
     float pulse_frac;
     sscanf((const char *)msg, "%" SCNu8 " "
                               "%" SCNi32,
@@ -82,8 +79,6 @@ void onmessage(int fd, const unsigned char *msg, size_t size, int type)
         control_data->valid = 1;
     }
     control_data->ch[channel].active = 1;
-    control_data->ch[channel].pulse_len_min = SERVO_MG995_PULSE_LEN_MIN;
-    control_data->ch[channel].pulse_len_max = SERVO_MG995_PULSE_LEN_MAX;
     control_data->ch[channel].pulse_frac = pulse_frac;
     /* END: Critical section */
     if (sem_post(control_data_sem) == -1)
