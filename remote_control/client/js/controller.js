@@ -121,7 +121,7 @@ function update_throttle(throttle) {
     document.getElementById("throttleVal").innerHTML = Math.round(throttle) + '%';
     document.getElementById("throttleValDrv").innerHTML = Math.round(throttle);
     if (ws_connected == true) {
-        ws.send(`1 ${Math.round(Number(throttle.toFixed(4)) * 10000)}\n`);
+        ws.send(`0 ${Math.round(Number(throttle.toFixed(4)) * 10000)}\n`);
     }
     const height = window.innerHeight;
     line_horiz.style.top = ((height * -throttle) / (2 * 100)) + "px";
@@ -131,7 +131,7 @@ function update_steering(steering) {
     document.getElementById("steeringVal").innerHTML = Math.round(steering) + '%';
     document.getElementById("steeringValDrv").innerHTML = Math.round(steering);
     if (ws_connected == true) {
-        ws.send(`0 ${Math.round(Number(steering.toFixed(4)) * 10000)}\n`);
+        ws.send(`1 ${Math.round(Number(steering.toFixed(4)) * 10000)}\n`);
     }
     const width = window.innerWidth;
     line_vert.style.left = ((width * steering) / (2 * 100)) + "px";
