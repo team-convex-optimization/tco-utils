@@ -5,7 +5,11 @@ mkdir -p build
 pushd lib
 pushd ws_server
 make
-mv libws.a ../../build/libws.a
+mv libws.a ../../build
+popd
+pushd tco_libd
+./build.sh
+mv build/tco_libd.a ../../build
 popd
 popd
 
@@ -16,9 +20,11 @@ clang \
     -I ../code \
     -I ../lib/ws_server/include \
     -I ../lib/tco_shmem \
+    -I ../lib/tco_libd/include \
     -lpthread \
     -lrt \
     ../code/main.c \
-    ../build/libws.a \
+    libws.a \
+    tco_libd.a \
     -o remote_control.bin
 popd

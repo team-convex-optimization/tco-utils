@@ -8,9 +8,13 @@
 #include <semaphore.h>
 #include <inttypes.h>
 #include <string.h>
+#include <errno.h>
 
 #include "ws.h"
 #include "tco_shmem.h"
+#include "tco_libd.h"
+
+int log_level = LOG_INFO | LOG_DEBUG | LOG_ERROR;
 
 static struct tco_shmem_data_control *control_data;
 static sem_t *control_data_sem;
@@ -24,7 +28,7 @@ void onopen(int fd)
 {
     char *cli;
     cli = ws_getaddress(fd);
-    printf("Connection opened, client: %d | addr: %s\n", fd, cli);
+    log_info("Connection opened, client: %d | addr: %s", fd, cli);
     free(cli);
 }
 
@@ -37,7 +41,7 @@ void onclose(int fd)
 {
     char *cli;
     cli = ws_getaddress(fd);
-    printf("Connection closed, client: %d | addr: %s\n", fd, cli);
+    log_info("Connection closed, client: %d | addr: %s", fd, cli);
     free(cli);
 }
 
@@ -53,8 +57,8 @@ void onmessage(int fd, const unsigned char *msg, size_t size, int type)
 {
     char *cli;
     cli = ws_getaddress(fd);
-    printf("Received a message: '%.*s' (size: %zu, type: %d), from: %s/%d\n", size - 1, msg, size,
-           type, cli, fd);
+    log_info("Received a message: '%.*s' (size: %zu, type: %d), from: %s/%d", size - 1, msg, size,
+             type, cli, fd);
     free(cli);
 
     /* Parse message */
@@ -65,11 +69,11 @@ void onmessage(int fd, const unsigned char *msg, size_t size, int type)
                               "%" SCNi32,
            &channel, &pulse_frac_raw);
     pulse_frac = ((pulse_frac_raw / 1000000.0f) + 1.0f) / 2.0f;
-    printf("Parsed message: Ch=%" PRIu8 "\tFRAC=%f\n", channel, pulse_frac);
+    log_debug("Parsed message: Ch=%" PRIu8 "\tFRAC=%f", channel, pulse_frac);
 
     if (sem_wait(control_data_sem) == -1)
     {
-        perror("sem_wait");
+        log_error("sem_wait: %s", strerror(errno));
         return;
     }
     /* START: Critical section */
@@ -83,10 +87,10 @@ void onmessage(int fd, const unsigned char *msg, size_t size, int type)
     /* END: Critical section */
     if (sem_post(control_data_sem) == -1)
     {
-        perror("sem_post");
+        log_error("sem_post: %s", strerror(errno));
         return;
     }
-    printf("\n");
+    log_debug("");
 }
 
 /**
@@ -95,33 +99,19 @@ void onmessage(int fd, const unsigned char *msg, size_t size, int type)
  */
 int main(void)
 {
-    /* Map shared memory object for control data into memory and open its associated semaphore. */
-    int shmem_fd = shm_open(TCO_SHMEM_NAME_CONTROL, O_RDWR, 0666);
-    if (shmem_fd == -1)
+    if (log_init("remote_control_server", "./log.txt") != 0)
     {
-        perror("shm_open");
-        printf("Failed to open the shared memory object.\n");
+        printf("Failed to initialize the logger.\n");
         return EXIT_FAILURE;
     }
-    control_data = (struct tco_shmem_data_control *)mmap(0, TCO_SHMEM_SIZE_CONTROL, PROT_READ | PROT_WRITE, MAP_SHARED, shmem_fd, 0);
-    if (control_data == MAP_FAILED)
+
+    struct tco_shmem_data_control *control_data;
+    sem_t *control_data_sem;
+    if (shmem_map(TCO_SHMEM_NAME_CONTROL, TCO_SHMEM_SIZE_CONTROL, TCO_SHMEM_NAME_SEM_CONTROL, O_RDWR, (void **)&control_data, &control_data_sem) != 0)
     {
-        perror("mmap");
-        printf("Failed to map the shared memory object into memory.\n");
+        log_error("Failed to map shared memory and associated semaphore");
         return EXIT_FAILURE;
     }
-    if (close(shmem_fd) == -1) /* No longer needed. */
-    {
-        perror("close"); /* Not a critical error. */
-    }
-    control_data_sem = sem_open(TCO_SHMEM_NAME_SEM_CONTROL, 0);
-    if (control_data_sem == SEM_FAILED)
-    {
-        perror("sem_open");
-        printf("Failed to open the semaphore associated with the shared memory object '%s'.\n", TCO_SHMEM_NAME_CONTROL);
-        return EXIT_FAILURE;
-    }
-    /* === */
 
     struct ws_events evs;
     evs.onopen = &onopen;
