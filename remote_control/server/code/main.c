@@ -105,8 +105,6 @@ int main(void)
         return EXIT_FAILURE;
     }
 
-    struct tco_shmem_data_control *control_data;
-    sem_t *control_data_sem;
     if (shmem_map(TCO_SHMEM_NAME_CONTROL, TCO_SHMEM_SIZE_CONTROL, TCO_SHMEM_NAME_SEM_CONTROL, O_RDWR, (void **)&control_data, &control_data_sem) != 0)
     {
         log_error("Failed to map shared memory and associated semaphore");
