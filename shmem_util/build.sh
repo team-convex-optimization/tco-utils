@@ -12,5 +12,6 @@ clang \
     -lrt \
     -pthread \
     ../code/main.c \
+    $1 \
     -o tco_shmem_util.bin
 popd
