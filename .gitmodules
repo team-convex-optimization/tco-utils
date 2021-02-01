@@ -10,3 +10,9 @@
 [submodule "remote_control/server/lib/tco_libd"]
 	path = remote_control/server/lib/tco_libd
 	url = https://github.com/team-convex-optimization/tco-libd.git
+[submodule "shmem_viewer/lib/tco_libd"]
+	path = shmem_viewer/lib/tco_libd
+	url = https://github.com/team-convex-optimization/tco-libd.git
+[submodule "shmem_viewer/lib/tco_shmem"]
+	path = shmem_viewer/lib/tco_shmem
+	url = https://github.com/team-convex-optimization/tco-shmem.git
