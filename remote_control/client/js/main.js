@@ -23,6 +23,11 @@ document.addEventListener("DOMContentLoaded", function (event) {
         window.addEventListener('deviceorientation', handle_orientation, false);
     }
     else {
+        /* Add gamepad */
+        window.addEventListener('gamepadconnected', connect_gamepad);
+        window.addEventListener('gamepaddisconnected', disconnect_gamepad);
+
+        /* Add Keyboard */
         window.addEventListener('keydown', handle_keydown, false);
         window.addEventListener('keyup', handle_keyup, false);
         interbal_update_loop_keyboard = setInterval(update_loop_keyboard, 16);
