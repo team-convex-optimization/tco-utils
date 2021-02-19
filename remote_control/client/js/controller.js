@@ -84,8 +84,8 @@ function update_loop_keyboard() {
     let next_throttle = 0;
     let next_steering = 0;
     if (mode_controller) {
-        next_throttle = gp.axes[throttle_axis] - gp.axes[brake_axis];
-        next_steering = gp.axes[steering_axis];
+        next_throttle = (gp.axes[throttle_axis] - gp.axes[brake_axis]) * 10000;
+        next_steering = gp.axes[steering_axis] * 10000;
     } else {
         let now_steering = 0;
         let now_throttle = 0;
