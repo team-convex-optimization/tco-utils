@@ -1,15 +1,11 @@
-var status_keypress = { 'w': false, 'a': false, 's': false, 'd': false, 'alt': false };
+let status_keypress = { 'w': false, 'a': false, 's': false, 'd': false, 'alt': false };
 
 /* Used to make keyboard steering smoother. */
-var last_throttle = 0.0;
-var last_steering = 0.0;
+let last_throttle = 0.0;
+let last_steering = 0.0;
 
-/* Used to toggle between controller and keyboard mode */
-var mode_controller = false;
-var gp = null;
-const throttle_axis = 1;
-const brake_axis = 2
-const steering_axis = 3;
+/* Reference to the connected gamepad */
+let gamepad_index = null;
 
 const line_horiz = document.getElementById("indHorz");
 const line_vert = document.getElementById("indVert");
@@ -80,51 +76,82 @@ function handle_keyup(event) {
     }
 }
 
+function connect_gamepad(event) {
+    console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
+        event.gamepad.index, event.gamepad.id,
+        event.gamepad.buttons.length, event.gamepad.axes.length
+    );
+    gamepad_index = event.gamepad.index;
+}
+
+function disconnect_gamepad(event) {
+    console.log("Gamepad disconnected from index %d: %s",
+        event.gamepad.index, event.gamepad.id
+    );
+    delete gamepads[event.gamepad.index];
+    gamepad_index = null;
+    mode_controller = false;
+}
+
+function update_loop_gamepad() {
+    // Only run update loop when a gamepad was connected
+    if (gamepad_index != null) {
+        const throttle_button = 7;
+        const brake_button = 6;
+        const steering_axis = 0;
+
+        let next_throttle = 0;
+        let next_steering = 0;
+
+        const gp = navigator.getGamepads()[gamepad_index];
+        next_throttle = ((gp.buttons[throttle_button].value) - gp.buttons[brake_button].value) * 100;
+        next_steering = gp.axes[steering_axis] * 100;
+
+        update_throttle(next_throttle);
+        update_steering(next_steering);
+    }
+}
+
 function update_loop_keyboard() {
     let next_throttle = 0;
     let next_steering = 0;
-    if (mode_controller) {
-        next_throttle = (gp.axes[throttle_axis] - gp.axes[brake_axis]) * 10000;
-        next_steering = gp.axes[steering_axis] * 10000;
-    } else {
-        let now_steering = 0;
-        let now_throttle = 0;
-        if (status_keypress['w']) {
-            if (status_keypress['alt']) {
-                now_throttle += 3;
-            }
-            else {
-                now_throttle += 1;
-            }
+    let now_steering = 0;
+    let now_throttle = 0;
+    if (status_keypress['w']) {
+        if (status_keypress['alt']) {
+            now_throttle += 3;
         }
-        if (status_keypress['s']) {
-            if (status_keypress['alt']) {
-                now_throttle -= 3;
-            }
-            else {
-                now_throttle -= 1;
-            }
+        else {
+            now_throttle += 1;
         }
-        if (status_keypress['a']) {
-            now_steering -= 100;
-        }
-        if (status_keypress['d']) {
-            now_steering += 100;
-        }
-
-        /* Apply new values. */
-        next_throttle = last_throttle + now_throttle;
-        const weight_new_steering = 0.20;
-        next_steering = ((1 - weight_new_steering) * last_steering) + (weight_new_steering * now_steering);
-
-        if (next_throttle > 100) next_throttle = 100;
-        if (next_throttle < -100) next_throttle = -100;
-        if (next_steering > 100) next_steering = 100;
-        if (next_steering < -100) next_steering = -100;
-
-        last_throttle = next_throttle;
-        last_steering = next_steering;
     }
+    if (status_keypress['s']) {
+        if (status_keypress['alt']) {
+            now_throttle -= 3;
+        }
+        else {
+            now_throttle -= 1;
+        }
+    }
+    if (status_keypress['a']) {
+        now_steering -= 100;
+    }
+    if (status_keypress['d']) {
+        now_steering += 100;
+    }
+
+    /* Apply new values. */
+    next_throttle = last_throttle + now_throttle;
+    const weight_new_steering = 0.20;
+    next_steering = ((1 - weight_new_steering) * last_steering) + (weight_new_steering * now_steering);
+
+    if (next_throttle > 100) next_throttle = 100;
+    if (next_throttle < -100) next_throttle = -100;
+    if (next_steering > 100) next_steering = 100;
+    if (next_steering < -100) next_steering = -100;
+
+    last_throttle = next_throttle;
+    last_steering = next_steering;
 
     update_throttle(next_throttle);
     update_steering(next_steering);
@@ -149,27 +176,4 @@ function update_steering(steering) {
     }
     const width = window.innerWidth;
     line_vert.style.left = ((width * steering) / (2 * 100)) + "px";
-}
-
-/* Gamepad functionality */
-
-/*
- * Chrome handles gamepads differently than other browser. You have to keep polling the gamepadstate.
-*/
-function connect_gamepad(event) {
-    console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
-        event.gamepad.index, event.gamepad.id,
-        event.gamepad.buttons.length, event.gamepad.axes.length
-    );
-    gp = navigator.getGamepads()[event.gamepad.index];
-    mode_controller = true;
-}
-
-function disconnect_gamepad(event) {
-    console.log("Gamepad disconnected from index %d: %s",
-        event.gamepad.index, event.gamepad.id
-    );
-    delete gamepads[gamepad.index];
-    gp = null;
-    mode_controller = false;
 }
