@@ -26,5 +26,5 @@ clang \
     ../code/main.c \
     libws.a \
     tco_libd.a \
-    -o remote_control.bin
+    -o tco_remote_control.bin
 popd
