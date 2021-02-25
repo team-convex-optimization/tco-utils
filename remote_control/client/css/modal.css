@@ -1,5 +1,5 @@
 .modal {
-  display: none;
+  /* display: none; */
   position: fixed;
   z-index: 1;
   left: 0;
@@ -16,7 +16,8 @@
   padding: 20px;
   border: none;
   width: 90%;
-  margin: 20% auto;
+  margin: 30vh auto 0 calc(50% - (min(400px, 90%) / 2));
+  box-sizing: border-box;
   max-width: 400px;
 }
 
@@ -52,4 +53,33 @@
 #btConnect:active {
   color:hsl(3, 30%, 26%);
   background-color: hsl(3, 30%, 56%);
+}
+
+#controlsSelector {
+  width: 100%;
+  height: calc(3em + 6px); /* To make modal background the correct height */
+}
+
+#controlsSelector > input[type=radio] {
+  display: none;
+}
+
+#controlsSelector > input[type=radio] + label {
+  display:inline-block;
+  vertical-align: middle;
+  text-align: center;
+  box-sizing: border-box;
+  float: left;
+  font-size: large;
+  font-weight: bold;
+  color: #5485cf;
+  line-height: 3em;
+  background-color: #91B1E0;
+  width: 33.334%;
+  user-select: none;
+}
+
+#controlsSelector > input[type=radio]:checked + label {
+  color: #225772;
+  background-color: #3689B3;
 }

@@ -1,8 +1,11 @@
-var status_keypress = { 'w': false, 'a': false, 's': false, 'd': false, 'alt': false };
+let status_keypress = { 'w': false, 'a': false, 's': false, 'd': false, 'alt': false };
 
 /* Used to make keyboard steering smoother. */
-var last_throttle = 0.0;
-var last_steering = 0.0;
+let last_throttle = 0.0;
+let last_steering = 0.0;
+
+/* Reference to the connected gamepad */
+let gamepad_index = null;
 
 const line_horiz = document.getElementById("indHorz");
 const line_vert = document.getElementById("indVert");
@@ -73,7 +76,45 @@ function handle_keyup(event) {
     }
 }
 
+function connect_gamepad(event) {
+    console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
+        event.gamepad.index, event.gamepad.id,
+        event.gamepad.buttons.length, event.gamepad.axes.length
+    );
+    gamepad_index = event.gamepad.index;
+}
+
+function disconnect_gamepad(event) {
+    console.log("Gamepad disconnected from index %d: %s",
+        event.gamepad.index, event.gamepad.id
+    );
+    delete gamepads[event.gamepad.index];
+    gamepad_index = null;
+    mode_controller = false;
+}
+
+function update_loop_gamepad() {
+    // Only run update loop when a gamepad was connected
+    if (gamepad_index != null) {
+        const throttle_button = 7;
+        const brake_button = 6;
+        const steering_axis = 0;
+
+        let next_throttle = 0;
+        let next_steering = 0;
+
+        const gp = navigator.getGamepads()[gamepad_index];
+        next_throttle = ((gp.buttons[throttle_button].value) - gp.buttons[brake_button].value) * 100;
+        next_steering = gp.axes[steering_axis] * 100;
+
+        update_throttle(next_throttle);
+        update_steering(next_steering);
+    }
+}
+
 function update_loop_keyboard() {
+    let next_throttle = 0;
+    let next_steering = 0;
     let now_steering = 0;
     let now_throttle = 0;
     if (status_keypress['w']) {
@@ -100,9 +141,9 @@ function update_loop_keyboard() {
     }
 
     /* Apply new values. */
-    let next_throttle = last_throttle + now_throttle;
+    next_throttle = last_throttle + now_throttle;
     const weight_new_steering = 0.20;
-    let next_steering = ((1 - weight_new_steering) * last_steering) + (weight_new_steering * now_steering);
+    next_steering = ((1 - weight_new_steering) * last_steering) + (weight_new_steering * now_steering);
 
     if (next_throttle > 100) next_throttle = 100;
     if (next_throttle < -100) next_throttle = -100;

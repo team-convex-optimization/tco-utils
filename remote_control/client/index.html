@@ -11,11 +11,19 @@
 </head>
 
 <body>
-	<!-- Connection modal -->
 	<div id="connectionModal" class="modal">
 		<div class="connectionModalContent">
 			<input type="url" id="txtServerAddr" placeholder="ws://localhost:8080"><br>
 			<input type="button" id="btConnect" name="btConnect" value="Connect">
+			<div id="controlsSelector">
+				<input type="radio" name="radioControlsSelect" id="radioControlsSelectKeyboard" value="keyboard"
+					checked>
+				<label for="radioControlsSelectKeyboard">Keyboard</label>
+				<input type="radio" name="radioControlsSelect" id="radioControlsSelectSensors" value="sensors">
+				<label for="radioControlsSelectSensors">Sensors</label>
+				<input type="radio" name="radioControlsSelect" id="radioControlsSelectGamepad" value="gamepad">
+				<label for="radioControlsSelectGamepad">Gamepad</label>
+			</div>
 		</div>
 	</div>
 	<div id="dbgInfo">
