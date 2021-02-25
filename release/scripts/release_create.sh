@@ -10,7 +10,6 @@ COLOR_CLEAR="\033[0m"
 repo_folder=repos
 bins_folder=bin
 
-# Pulls all repos it will need
 pull_all() {
     echo -e "\n${COLOR_GREEN}Pulling All Repos${COLOR_CLEAR}\n"
     mkdir $repo_folder
