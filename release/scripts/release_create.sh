@@ -29,6 +29,7 @@ pull_all() {
 
 build_and_move_bin_all() {
     echo -e "\n${COLOR_GREEN}Building All Repos${COLOR_CLEAR}\n"
+    rm -rf $bins_folder
     mkdir $bins_folder
     cd $repo_folder
     for bash_script in ./**/*.sh
