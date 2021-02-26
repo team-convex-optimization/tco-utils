@@ -14,7 +14,7 @@
 #include "tco_shmem.h"
 #include "tco_libd.h"
 
-int log_level = LOG_INFO | LOG_DEBUG | LOG_ERROR;
+int log_level = LOG_INFO | LOG_ERROR; /* | LOG_DEBUG */
 
 static struct tco_shmem_data_control *control_data;
 static sem_t *control_data_sem;
@@ -57,8 +57,8 @@ void onmessage(int fd, const unsigned char *msg, size_t size, int type)
 {
     char *cli;
     cli = ws_getaddress(fd);
-    log_info("Received a message: '%.*s' (size: %zu, type: %d), from: %s/%d", size - 1, msg, size,
-             type, cli, fd);
+    log_debug("Received a message: '%.*s' (size: %zu, type: %d), from: %s/%d", size - 1, msg, size,
+              type, cli, fd);
     free(cli);
 
     /* Parse message */
@@ -90,7 +90,6 @@ void onmessage(int fd, const unsigned char *msg, size_t size, int type)
         log_error("sem_post: %s", strerror(errno));
         return;
     }
-    log_debug("");
 }
 
 /**
