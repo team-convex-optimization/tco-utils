@@ -20,6 +20,8 @@ pull_all() {
         git clone --recurse-submodules https://github.com/team-convex-optimization/${repo}.git
         if [ $? -ne 0 ]; then
             cd $repo
+            # Force pull (ignore all local changes)
+            git reset --hard
             git pull
             cd ..
         fi
