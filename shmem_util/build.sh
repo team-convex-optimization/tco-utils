@@ -7,6 +7,7 @@ clang \
     -D _DEFAULT_SOURCE \
     -Wall \
     -std=c11 \
+    -D TRAINING \
     -I ../code \
     -I ../lib/tco_shmem \
     -lrt \
