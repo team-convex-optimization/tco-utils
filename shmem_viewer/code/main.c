@@ -50,8 +50,8 @@ int main(int argc, char const *argv[argc])
 
     char *shmem_names[] = TCO_SHMEM_ARR_NAME;
     char *shmem_sem_names[] = TCO_SHMEM_ARR_SEM_NAME;
-    uint16_t shmem_sizes[] = TCO_SHMEM_ARR_SIZE;
-    uint8_t shmem_count = sizeof(shmem_sizes) / sizeof(uint16_t);
+    uint32_t shmem_sizes[] = TCO_SHMEM_ARR_SIZE;
+    uint8_t shmem_count = sizeof(shmem_sizes) / sizeof(uint32_t);
 
     uint8_t shmem_id = 0;
     if (strcmp(argv[1], "-i") == 0 || strcmp(argv[1], "--index") == 0)
@@ -90,11 +90,11 @@ int main(int argc, char const *argv[argc])
     addstr(shmem_names[shmem_id]);
     addch('\n');
 
-    const uint16_t shmem_data_len = shmem_sizes[shmem_id];
+    uint32_t const shmem_data_len = shmem_sizes[shmem_id];
     uint8_t shmem_data_cpy[shmem_data_len];
 
     /* Explanation for the string length: 2 hex digits per byte, n-1 spaces between the hex digits, at most n new lines. */
-    const uint16_t shmem_data_string_len = (shmem_sizes[shmem_id] * 2) + shmem_sizes[shmem_id] - 1 + shmem_sizes[shmem_id];
+    uint16_t const shmem_data_string_len = (shmem_sizes[shmem_id] * 2) + shmem_sizes[shmem_id] - 1 + shmem_sizes[shmem_id];
     char shmem_data_string[shmem_data_string_len];
 
     int key = 0;
