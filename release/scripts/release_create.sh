@@ -7,7 +7,7 @@ shopt -s globstar
 
 # Github person access token (note that the default value is not a real access token)
 token=1164e2e2fa4f631e26d01de9d165c0629b8f9288
-repos=(tco-actuationd tco-controld tco-utils)
+repos=(tco-actuationd tco-controld tco-utils tco-pland)
 
 # Colors
 COLOR_GREEN="\033[0;32m"
