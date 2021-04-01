@@ -16,3 +16,6 @@
 [submodule "shmem_viewer/lib/tco_shmem"]
 	path = shmem_viewer/lib/tco_shmem
 	url = https://github.com/team-convex-optimization/tco-shmem.git
+[submodule "circle_vector_gen/lib/tco_linalg"]
+	path = circle_vector_gen/lib/tco_linalg
+	url = https://github.com/team-convex-optimization/tco-linalg.git
