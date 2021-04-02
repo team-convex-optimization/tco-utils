@@ -27,12 +27,23 @@ void arr_reverse(uint8_t *const arr, uint8_t const el_size, uint16_t const lengt
 /* Print out the points in a C designated initializer format. */
 void print_vec_designated_initializer(vec2_t *const arr, uint16_t const length)
 {
-    printf("{");
+    printf("Designated Initializer:\n\n{");
     for (uint16_t vec_idx = 0; vec_idx < length; vec_idx++)
     {
         printf("\n{%hi,%hi},", arr[vec_idx].x, arr[vec_idx].y);
     }
     printf("\n}\n");
+}
+
+/* Print out the points in a point format. */
+void print_vec_point_lists(vec2_t *const arr, uint16_t const length)
+{
+    printf("Points:\n\n");
+    for (uint16_t vec_idx = 0; vec_idx < length; vec_idx++)
+    {
+        printf("(%hi,%hi),", arr[vec_idx].x, arr[vec_idx].y);
+    }
+    printf("\n");
 }
 
 int main(int argc, char const *argv[])
@@ -93,12 +104,12 @@ int main(int argc, char const *argv[])
     /* Offsets to quadrants and special elements inide of "all" array. */
     uint16_t const up_offset = 0;
     uint16_t const quadrant1_offset = up_offset + 1;
-    uint16_t const left_offset = quadrant1_offset + quadrant_size;
-    uint16_t const quadrant3_offset = left_offset + 1;
-    uint16_t const down_offset = quadrant3_offset + quadrant_size;
-    uint16_t const quadrant4_offset = down_offset + 1;
-    uint16_t const right_offset = quadrant4_offset + quadrant_size;
-    uint16_t const quadrant2_offset = right_offset + 1;
+    uint16_t const right_offset = quadrant1_offset + quadrant_size;
+    uint16_t const quadrant4_offset = right_offset + 1;
+    uint16_t const down_offset = quadrant4_offset + quadrant_size;
+    uint16_t const quadrant3_offset = down_offset + 1;
+    uint16_t const left_offset = quadrant3_offset + quadrant_size;
+    uint16_t const quadrant2_offset = left_offset + 1;
 
     /* Q4 */
     arr_reverse((uint8_t *)quadrant4_down, sizeof(vec2_t), quadrant4_down_size);
@@ -110,7 +121,6 @@ int main(int argc, char const *argv[])
     memcpy(&all[quadrant1_offset], &all[quadrant4_offset], quadrant_size * sizeof(vec2_t));
     for (uint16_t q1_idx = 0; q1_idx < quadrant_size; q1_idx++)
     {
-        all[quadrant1_offset + q1_idx].x *= -1;
         all[quadrant1_offset + q1_idx].y *= -1;
     }
 
@@ -119,6 +129,7 @@ int main(int argc, char const *argv[])
     for (uint16_t q2_idx = 0; q2_idx < quadrant_size; q2_idx++)
     {
         all[quadrant2_offset + q2_idx].y *= -1;
+        all[quadrant2_offset + q2_idx].x *= -1;
     }
     arr_reverse((uint8_t *)&all[quadrant2_offset], sizeof(vec2_t), quadrant_size);
 
@@ -128,7 +139,8 @@ int main(int argc, char const *argv[])
     {
         all[quadrant3_offset + q3_idx].x *= -1;
     }
-    arr_reverse((uint8_t *)&all[quadrant3_offset], sizeof(vec2_t), quadrant_size);
+
+    arr_reverse((uint8_t *)&all[quadrant4_offset], sizeof(vec2_t), quadrant_size);
 
     /* Special points */
     memcpy(&all[up_offset], &up, sizeof(vec2_t));
@@ -137,5 +149,7 @@ int main(int argc, char const *argv[])
     memcpy(&all[right_offset], &right, sizeof(vec2_t));
 
     print_vec_designated_initializer(all, sizeof(all) / sizeof(vec2_t));
+    printf("\n");
+    print_vec_point_lists(all, sizeof(all) / sizeof(vec2_t));
     return 0;
 }
