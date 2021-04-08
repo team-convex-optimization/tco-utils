@@ -18,7 +18,6 @@ clang \
     -l ncurses \
     -l pthread \
     -l rt \
-    $1 \
     ../code/*.c \
     tco_libd.a \
     -o tco_shmem_viewer.bin

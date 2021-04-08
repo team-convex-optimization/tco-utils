@@ -1,5 +1,4 @@
 #!/bin/bash
-# TODO: Use 'pushd' and 'popd' instead of 'cd'
 
 # Don't want a glob pattern that matched nothing to remain unchanged
 shopt -s nullglob

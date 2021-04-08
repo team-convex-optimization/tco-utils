@@ -77,11 +77,6 @@ void onmessage(int fd, const unsigned char *msg, size_t size, int type)
         return;
     }
     /* START: Critical section */
-    if (control_data->valid == 0)
-    {
-        memset(control_data, 0, TCO_SHMEM_SIZE_CONTROL);
-        control_data->valid = 1;
-    }
     control_data->ch[channel].active = 1;
     control_data->ch[channel].pulse_frac = pulse_frac;
     /* END: Critical section */

@@ -3,14 +3,17 @@
 mkdir -p build
 
 pushd lib
+
 pushd ws_server
 make
 mv libws.a ../../build
 popd
+
 pushd tco_libd
 ./build.sh
 mv build/tco_libd.a ../../build
 popd
+
 popd
 
 pushd build
