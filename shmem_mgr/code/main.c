@@ -24,7 +24,7 @@ typedef enum
 
 void static usage_msg(void)
 {
-    printf("Usage: tco_shmem_util <[-c | --create] | [-d | --delete] | [-h | --help]>\n");
+    printf("Usage: tco_shmem_mgr.bin <[-c | --create] | [-d | --delete] | [-h | --help]>\n");
 }
 
 command_t static parse_arguments(int argc, char const *argv[])
@@ -104,16 +104,17 @@ void static shmem_create(void)
             }
             else
             {
-                uint8_t *valid_flag = mmap(0, shmem_sizes[shmem_i], PROT_WRITE, MAP_SHARED, fd, 0);
-                if (valid_flag == MAP_FAILED)
+                uint8_t *shmem = mmap(0, shmem_sizes[shmem_i], PROT_WRITE, MAP_SHARED, fd, 0);
+                if (shmem == MAP_FAILED)
                 {
                     perror("mmap");
-                    printf("Failed to set the 'valid' flag\n"); /* Not a critical error but important to notify the user. */
+                    printf("Failed to initialize a shared memory region. Please re-run this tool to ensure the shared memory region is initialized to known values\n");
+                    exit(EXIT_FAILURE);
                 }
                 else
                 {
-                    *valid_flag = 0;
-                    printf("Set the 'valid' flag to 0 (invalid)\n");
+                    memset(shmem, 0, shmem_sizes[shmem_i]);
+                    printf("Shared memory region has been initialized to all 0's\n");
                 }
 
                 printf("Successfully created the shared memory object\n");
