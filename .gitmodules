@@ -19,3 +19,11 @@
 [submodule "shmem_mgr/lib/tco_shmem"]
 	path = shmem_mgr/lib/tco_shmem
 	url = https://github.com/team-convex-optimization/tco-shmem.git
+
+[submodule "recorder/lib/tco_shmem"]
+	path = recorder/lib/tco_shmem
+	url = https://github.com/team-convex-optimization/tco-shmem.git
+[submodule "recorder/lib/tco_libd"]
+	path = recorder/lib/tco_libd
+	url = https://github.com/team-convex-optimization/tco-libd.git
+

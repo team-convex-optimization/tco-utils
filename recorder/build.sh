@@ -15,10 +15,9 @@ clang \
     -I ../code \
     -I ../lib/tco_libd/include \
     -I ../lib/tco_shmem \
-    -l ncurses \
-    -l pthread \
     -l rt \
+    -l pthread -g\
     ../code/*.c \
     tco_libd.a \
-    -o tco_shmem_viewer.bin
+    -o tco_recorder.bin
 popd

@@ -34,14 +34,16 @@ int shmem_parse(uint8_t *data, uint16_t size, char *target, uint16_t target_size
     return 0;
 }
 
+int dump_file(uint8_t *const data, uint32_t const data_len)
+{
+    FILE *file = fopen("dump.txt", "wb");
+    fwrite(data, sizeof(uint8_t), data_len, file);
+    fclose(file);
+    return 0;
+}
+
 int main(int argc, char const *argv[argc])
 {
-    if (argc != 3)
-    {
-        print_usage();
-        return EXIT_FAILURE;
-    }
-
     if (log_init("shmem_viewer", "./log.txt") != 0)
     {
         printf("Failed to initialize the logger\n");
@@ -52,6 +54,7 @@ int main(int argc, char const *argv[argc])
     char *shmem_sem_names[] = TCO_SHMEM_ARR_SEM_NAME;
     uint32_t shmem_sizes[] = TCO_SHMEM_ARR_SIZE;
     uint8_t shmem_count = sizeof(shmem_sizes) / sizeof(uint32_t);
+    uint8_t dump_file_only = 0;
 
     uint8_t shmem_id = 0;
     if (strcmp(argv[1], "-i") == 0 || strcmp(argv[1], "--index") == 0)
@@ -60,6 +63,11 @@ int main(int argc, char const *argv[argc])
         if (shmem_id >= shmem_count)
         {
             printf("The requested shmem ID does not exist, there are %u shared memory regions\n", shmem_count);
+        }
+
+        if (argc == 4 && strcmp(argv[3], "--dump") == 0)
+        {
+            dump_file_only = 1;
         }
     }
     else
@@ -122,11 +130,17 @@ int main(int argc, char const *argv[argc])
             return EXIT_FAILURE;
         }
 
+        if (dump_file_only)
+        {
+            dump_file(shmem_data_cpy, shmem_sizes[shmem_id]);
+            break;
+        }
         if (shmem_parse(shmem_data_cpy, shmem_data_len, shmem_data_string, shmem_data_string_len, 32) != 0)
         {
             log_error("Failed to parse contents of shmem");
             return EXIT_FAILURE;
         }
+
         addstr(shmem_data_string);
         move(1, 0);
         refresh();
