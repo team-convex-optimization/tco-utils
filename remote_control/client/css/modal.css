@@ -21,6 +21,10 @@
   max-width: 400px;
 }
 
+.videoCanvas {
+  text-align: center;
+}
+
 #txtServerAddr, #btConnect {
   text-align: center;
   color: #000;

@@ -14,10 +14,40 @@
 #include "tco_shmem.h"
 #include "tco_libd.h"
 
+static int video = 0; /* If 0, no video will be sent/processed to client. */
 int log_level = LOG_INFO | LOG_ERROR; /* | LOG_DEBUG */
 
+static struct tco_shmem_data_state *control_state;
 static struct tco_shmem_data_control *control_data;
 static sem_t *control_data_sem;
+static sem_t *control_state_sem;
+
+void usage()
+{
+  printf("Usage: ./tco_remote_control.bin <[--video | -v | [--help | -h]>\n"
+         "'-v': Send shmem image frames over the websocket to the connected client. \n");
+}
+
+/**
+ * @brief reads image from shmem
+ * @param msg is a buffer of (already allocated) TCO_FRAME_HEIGHT * TCO_FRAME_WIDTH bytes
+ * @return is void. Result is in msg. 
+ */
+void prepare_img_frame(uint8_t (*msg)[TCO_FRAME_HEIGHT * TCO_FRAME_WIDTH]) {
+    if (sem_wait(control_state_sem) == -1)
+    {
+        log_error("sem_wait: %s", strerror(errno));
+        return;
+    }
+    /* START: Critical section */
+    memcpy(msg, control_state->frame, TCO_FRAME_HEIGHT*TCO_FRAME_WIDTH);
+    /* END: Critical section */
+    if (sem_post(control_state_sem) == -1)
+    {
+        log_error("sem_post: %s", strerror(errno));
+        return;
+    }
+}
 
 /**
  * @brief Called when a client connects to the server.
@@ -61,6 +91,12 @@ void onmessage(int fd, const unsigned char *msg, size_t size, int type)
               type, cli, fd);
     free(cli);
 
+    if (video) { /* Send the image frame to the client */
+        _Alignas(4) uint8_t reply[TCO_FRAME_HEIGHT * TCO_FRAME_WIDTH]; /* Buffer for Image Reply */
+        prepare_img_frame(&reply);
+        ws_sendframe_bin(fd, (char *)reply, TCO_FRAME_HEIGHT*TCO_FRAME_WIDTH, 1);
+    }
+
     /* Parse message */
     uint8_t channel;
     int32_t pulse_frac_raw;
@@ -85,13 +121,14 @@ void onmessage(int fd, const unsigned char *msg, size_t size, int type)
         log_error("sem_post: %s", strerror(errno));
         return;
     }
+
 }
 
 /**
  * @note After invoking @ref ws_socket, this routine never returns, unless if invoked from a
  * different thread.
  */
-int main(void)
+int main(int argc, char *argv[])
 {
     if (log_init("remote_control_server", "./log.txt") != 0)
     {
@@ -103,6 +140,19 @@ int main(void)
     {
         log_error("Failed to map shared memory and associated semaphore");
         return EXIT_FAILURE;
+    }
+
+    if (shmem_map(TCO_SHMEM_NAME_STATE, TCO_SHMEM_SIZE_STATE, TCO_SHMEM_NAME_SEM_STATE, O_RDONLY, (void **)&control_state, &control_state_sem) != 0)
+    {
+        log_error("Failed to map shared memory and associated semaphore");
+        return EXIT_FAILURE;
+    }
+
+    if (argc == 2 && (strcmp(argv[1], "--video") == 0 || strcmp(argv[1], "-v")) == 0) {
+        video = 1;
+    } else if (argc == 2 && (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-h")) == 0) {
+        usage();
+        return 0;
     }
 
     struct ws_events evs;
