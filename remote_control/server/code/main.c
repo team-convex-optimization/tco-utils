@@ -9,18 +9,28 @@
 #include <inttypes.h>
 #include <string.h>
 #include <errno.h>
+#include <pthread.h>
+#include <unistd.h>
 
 #include "ws.h"
 #include "tco_shmem.h"
 #include "tco_libd.h"
 
-static int video = 0; /* If 0, no video will be sent/processed to client. */
+typedef enum { /* Simple enumeration to keep track of video state */
+    OFF = 0,
+    INIT = 1,
+    RUNNING = 2
+} video_status_t;
+static video_status_t video = OFF; 
+
 int log_level = LOG_INFO | LOG_ERROR; /* | LOG_DEBUG */
 
 static struct tco_shmem_data_state *control_state;
 static struct tco_shmem_data_control *control_data;
 static sem_t *control_data_sem;
 static sem_t *control_state_sem;
+static pthread_t vThread; /* Thread for sending video frames */
+
 
 void usage()
 {
@@ -46,6 +56,24 @@ void prepare_img_frame(uint8_t (*msg)[TCO_FRAME_HEIGHT * TCO_FRAME_WIDTH]) {
     {
         log_error("sem_post: %s", strerror(errno));
         return;
+    }
+}
+
+/**
+ * @brief a function meant to be run by a separate thread to send images to a socket
+ * @p args is a void * with the fd to send frames to
+ * @return never returns
+ */
+void *send_frames(void *args) {
+    int fd = ((int *)args)[0];
+    while (1) {
+        _Alignas(4) uint8_t reply[TCO_FRAME_HEIGHT * TCO_FRAME_WIDTH]; /* Buffer for Image Reply */
+        prepare_img_frame(&reply);
+        if (ws_sendframe_bin(fd, (char *)reply, TCO_FRAME_HEIGHT*TCO_FRAME_WIDTH, 1) <= 0) {
+            log_error("failed to send frame to socket");
+            exit(-1);
+        }
+        usleep(50000); /* Sleep for 1/20 seconds for 20 frames a second */
     }
 }
 
@@ -91,10 +119,12 @@ void onmessage(int fd, const unsigned char *msg, size_t size, int type)
               type, cli, fd);
     free(cli);
 
-    if (video) { /* Send the image frame to the client */
-        _Alignas(4) uint8_t reply[TCO_FRAME_HEIGHT * TCO_FRAME_WIDTH]; /* Buffer for Image Reply */
-        prepare_img_frame(&reply);
-        ws_sendframe_bin(fd, (char *)reply, TCO_FRAME_HEIGHT*TCO_FRAME_WIDTH, 1);
+    if (video == INIT) { /* Send the image frame to the client */
+        video = RUNNING;
+        if (pthread_create(&vThread, NULL, send_frames, (void *)&fd) != 0) { /* Never returns */
+            log_error("failed to create frame_server thread : %s", strerror(errno));
+            video = OFF;
+        };
     }
 
     /* Parse message */
@@ -149,7 +179,7 @@ int main(int argc, char *argv[])
     }
 
     if (argc == 2 && (strcmp(argv[1], "--video") == 0 || strcmp(argv[1], "-v")) == 0) {
-        video = 1;
+        video = INIT;
     } else if (argc == 2 && (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-h")) == 0) {
         usage();
         return 0;

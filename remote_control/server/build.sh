@@ -18,6 +18,7 @@ popd
 
 pushd build
 clang \
+    -D _DEFAULT_SOURCE \
     -Wall \
     -std=c11 \
     -I ../code \
