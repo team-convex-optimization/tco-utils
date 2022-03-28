@@ -18,7 +18,7 @@ void net_onmessage(int fd, const unsigned char *msg, size_t size, int type);
  *************************************************/
 
 void host_start(const int port) {
-    if (!shmem_init(O_RDONLY)) {
+    if (shmem_init(O_RDONLY)) {
         log_error("Failed to init shmem");
         exit(-1);
     }
@@ -62,6 +62,7 @@ void *send_frames(void *args) {
     int fd = ((int *)args)[0];
     struct tco_shmem_data_control reply = {0}; /* Buffer for Image Reply */
     while (1) {
+        log_info("send frame");
         get_or_set_data(&reply, 1);
         if (ws_sendframe_bin(fd, (char *)(&reply), TCO_SHMEM_SIZE_CONTROL, 0) <= 0) {
             log_error("failed to send frame to socket");

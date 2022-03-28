@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "tco_libd.h"
 #include "utils.h"
@@ -32,7 +33,7 @@ int shmem_init(int access_mode)
     {
         return EXIT_FAILURE;
     }
-    if (shmem_map(TCO_SHMEM_NAME_STATE, TCO_SHMEM_SIZE_STATE, TCO_SHMEM_NAME_SEM_STATE, access_mode, (void **)&shmem_control_data, &shmem_control_sem) != 0)
+    if (shmem_map(TCO_SHMEM_NAME_CONTROL, TCO_SHMEM_SIZE_CONTROL, TCO_SHMEM_NAME_SEM_CONTROL, access_mode, (void **)&shmem_control_data, &shmem_control_sem) != 0)
     {
         log_error("Failed to map shared memory and associated semaphore");
         return EXIT_FAILURE;

@@ -62,9 +62,9 @@ int main(int argc, char *argv[])
 		const int port = atoi(argv[2]);
 		host_start(port); /* never returns */
 	}
-	else if (argc == 4 && strcmp("-c", argv[1]) == 0)
+	else if (argc == 5 && strcmp("-c", argv[1]) == 0)
 	{
-		client_start(argv[2], atoi(argv[3])); /* never returns */
+		client_start(argv[2], atoi(argv[4])); /* never returns */
 	}
 	else
 	{

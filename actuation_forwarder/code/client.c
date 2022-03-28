@@ -15,8 +15,15 @@ void run() {
 }
 
 void client_start(const char *ip, const int port) {
-    shmem_init(O_WRONLY);
+    if (shmem_init(O_WRONLY)) {
+        log_error("Failed to init client shmem");
+        exit(-1);
+    }
     tws_connect(&ctx, ip, port);
+    if (tws_sendframe(&ctx, "TCO_START", 10, 1)) {
+        log_error("Failed to send initial message");
+        exit(-1);
+    }
     run();
 }
 
