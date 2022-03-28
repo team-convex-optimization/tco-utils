@@ -27,7 +27,7 @@
 	#define FRM_FIN 128
 	#define FRM_MSK 128
 
-	#define MESSAGE_LENGTH 1024
+	#define MESSAGE_LENGTH 2048
 
 	/* Client status. */
 	#define TWS_ST_DISCONNECTED 0

@@ -20,7 +20,8 @@ void client_start(const char *ip, const int port) {
         exit(-1);
     }
     tws_connect(&ctx, ip, port);
-    if (tws_sendframe(&ctx, "TCO_START", 10, 1)) {
+    char *hellotxt = "TCO_START";
+    if (tws_sendframe(&ctx, (uint8_t *)hellotxt, strlen(hellotxt), 1)) {
         log_error("Failed to send initial message");
         exit(-1);
     }

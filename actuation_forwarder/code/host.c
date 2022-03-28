@@ -1,5 +1,6 @@
 #include "host.h"
 #include "utils.h"
+#include <stdio.h>
 
 struct ws_events evs;
 enum ws_state net_state = INIT;
@@ -60,11 +61,13 @@ void net_onclose(int fd)
  */
 void *send_frames(void *args) {
     int fd = ((int *)args)[0];
-    struct tco_shmem_data_control reply = {0}; /* Buffer for Image Reply */
+    fd = 5;
+    _Alignas(4) struct tco_shmem_data_control reply; /* Buffer for Image Reply */
     while (1) {
-        log_info("send frame");
+        log_info("send frame to %d", fd);
         get_or_set_data(&reply, 1);
-        if (ws_sendframe_bin(fd, (char *)(&reply), TCO_SHMEM_SIZE_CONTROL, 0) <= 0) {
+        printf("first value is %f to fd %d\n", reply.ch[0].pulse_frac, fd);
+        if (ws_sendframe_bin(fd, (const char *)(&reply), TCO_SHMEM_SIZE_CONTROL, 0) == -1) {
             log_error("failed to send frame to socket");
             exit(-1);
         }
@@ -84,8 +87,10 @@ void net_onmessage(int fd, const unsigned char *msg, size_t size, int type)
 {
     char *cli;
     cli = ws_getaddress(fd);
-    log_debug("Received a message: '%.*s' (size: %zu, type: %d), from: %s/%d", size - 1, msg, size,
+    printf("Received a message: '%s' (size: %zu, type: %d), from: %s/%d", msg, size,
               type, cli, fd);
+    log_debug("Received a message: '%.*s' (size: %zu, type: %d), from: %s/%d and fd is %d", size - 1, msg, size,
+              type, cli, fd, fd);
     free(cli);
 
     if (net_state == INIT) { /* Send the image frame to the client */
@@ -95,4 +100,5 @@ void net_onmessage(int fd, const unsigned char *msg, size_t size, int type)
             net_state = ERR;
         };
     }
+
 }

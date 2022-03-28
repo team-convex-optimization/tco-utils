@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "tco_shmem.h"
 #include "tco_libd.h"
