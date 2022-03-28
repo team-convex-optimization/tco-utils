@@ -1,5 +1,5 @@
 #include "client.h"
-
+#include <stdio.h>
 struct tws_ctx ctx;
 
 void run() {
@@ -10,12 +10,13 @@ void run() {
             log_error("Failed to receive message!");
             exit(-1);
         }
+        printf("GOT DATA PAPI\n");
         get_or_set_data(shmem_control_data, 0);
     }
 }
 
 void client_start(const char *ip, const int port) {
-    if (shmem_init(O_WRONLY)) {
+    if (shmem_init(O_RDWR)) {
         log_error("Failed to init client shmem");
         exit(-1);
     }
