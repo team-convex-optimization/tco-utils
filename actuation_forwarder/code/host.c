@@ -28,6 +28,10 @@ void host_start(const int port) {
     ws_socket(&evs, port, 0); /* Never returns. */
 }
 
+void host_stop() {
+    log_info("Cleaning up host");
+}
+
 /*****************************************
  ***** START WS protocol definitions *****
  *****************************************/
@@ -60,13 +64,14 @@ void net_onclose(int fd)
  * @return never returns
  */
 void *send_frames(void *args) {
+    /* Main loop */
     int fd = (int) args;
     _Alignas(4) struct tco_shmem_data_control reply; /* Buffer for Image Reply */
     while (1) {
         get_or_set_data(&reply, 1);
         if (ws_sendframe_bin(fd, (const char *)(&reply), TCO_SHMEM_SIZE_CONTROL, 0) == -1) {
-            log_error("failed to send frame to socket");
-            exit(-1);
+            log_error("failed to send frame to socket. Disconnect?");
+            pthread_exit((void *)-1);
         }
         usleep(25000); /* Sleep for 1/40 seconds for 40 frames a second */
     }
@@ -97,5 +102,5 @@ void net_onmessage(int fd, const unsigned char *msg, size_t size, int type)
             net_state = ERR;
         };
     }
-
 }
+

@@ -16,9 +16,6 @@ popd
 
 popd
 
-# cp lib/ws_server/extra/toyws/toyws.h code/toyws.h
-# cp lib/ws_server/extra/toyws/toyws.c code/toyws.c
-
 pushd build
 clang \
     -D _DEFAULT_SOURCE \
@@ -30,7 +27,7 @@ clang \
     -I ../lib/tco_libd/include \
     -lpthread \
     -lrt \
-    -g \
+    -O3 \
     ../code/*.c \
     libws.a \
     tco_libd.a \

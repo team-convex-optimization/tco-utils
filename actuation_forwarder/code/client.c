@@ -28,3 +28,9 @@ void client_start(const char *ip, const int port) {
     run();
 }
 
+void client_stop() {
+    log_info("Cleaning up client state...");
+    tws_close(&ctx);
+    log_info("Cleaning up complete.");
+}
+

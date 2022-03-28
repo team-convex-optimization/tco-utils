@@ -20,4 +20,6 @@ enum ws_state {
 
 void host_start(const int port);
 
+void host_stop();
+
 #endif /*_HOST_H_ */

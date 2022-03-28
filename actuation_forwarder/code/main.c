@@ -9,6 +9,7 @@
 #include "client.h"
 
 const int log_level = LOG_INFO | LOG_ERROR | LOG_DEBUG;
+int host = 0;
 
 /**
  * @brief Instruct how to use the program.
@@ -30,6 +31,12 @@ static void handle_stop(int sig)
         log_error("Failed to cleanup shmem");
         exit(EXIT_FAILURE);
     }
+
+	if (host) {
+		host_stop(); /* Does nothing */
+	} else {
+		client_stop();
+	}
 
     log_info("Succesfully cleaned. Exiting.");
     exit(EXIT_SUCCESS);
@@ -60,6 +67,7 @@ int main(int argc, char *argv[])
 	if (argc == 3 && strcmp("-h", argv[1]) == 0)
 	{
 		log_info("Started Host");
+		host = 1;
 		const int port = atoi(argv[2]);
 		host_start(port); /* never returns */
 	}
