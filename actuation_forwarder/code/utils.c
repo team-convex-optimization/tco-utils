@@ -24,6 +24,9 @@ int shmem_cleanup()
             return EXIT_FAILURE;
         }
     }
+    shmem_control_data->ch[0].pulse_frac = 0.0f; /* Set brakes on */
+    get_or_set_data(shmem_control_data, 0); 
+
     return EXIT_SUCCESS;
 }
 
@@ -53,6 +56,7 @@ void get_or_set_data(struct tco_shmem_data_control *data, uint8_t dir) {
         log_error("sem_wait: %s", strerror(errno));
         return;
     }
+    shmem_control_open = 1;
     /* START: Critical section */
     switch (dir)
     {
@@ -69,4 +73,5 @@ void get_or_set_data(struct tco_shmem_data_control *data, uint8_t dir) {
         log_error("sem_post: %s", strerror(errno));
         return;
     }
+    shmem_control_open = 0;
 }

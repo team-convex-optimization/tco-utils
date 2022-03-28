@@ -10,7 +10,7 @@ extern uint8_t shmem_control_open;
 
 /**
  * @brief Performs any necessary cleanup related to shared memory. This needs to be called before
- * terminating after shmem has been initialized.
+ * terminating after shmem has been initialized. Will set brakes on.
  * @return 0 on success and 1 on failure.
  */
 int shmem_cleanup();

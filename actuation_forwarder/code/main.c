@@ -50,6 +50,7 @@ static void register_stop_handler(void)
 
 int main(int argc, char *argv[])
 {
+	register_stop_handler();
 	if (log_init("actuation_forwarder", "./log.txt") != 0)
 	{
 		printf("Failed to initialize the logger\n");
