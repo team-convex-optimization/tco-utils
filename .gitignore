@@ -4,4 +4,5 @@ log.txt
 # VSCode
 .vscode
 
-
+# toyws
+code/toyws.*
