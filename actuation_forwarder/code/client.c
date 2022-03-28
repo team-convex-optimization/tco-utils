@@ -10,7 +10,6 @@ void run() {
             log_error("Failed to receive message!");
             exit(-1);
         }
-        printf("GOT DATA PAPI\n");
         get_or_set_data(shmem_control_data, 0);
     }
 }

@@ -60,13 +60,10 @@ void net_onclose(int fd)
  * @return never returns
  */
 void *send_frames(void *args) {
-    int fd = ((int *)args)[0];
-    fd = 5;
+    int fd = (int) args;
     _Alignas(4) struct tco_shmem_data_control reply; /* Buffer for Image Reply */
     while (1) {
-        log_info("send frame to %d", fd);
         get_or_set_data(&reply, 1);
-        printf("first value is %f to fd %d\n", reply.ch[0].pulse_frac, fd);
         if (ws_sendframe_bin(fd, (const char *)(&reply), TCO_SHMEM_SIZE_CONTROL, 0) == -1) {
             log_error("failed to send frame to socket");
             exit(-1);
@@ -87,7 +84,7 @@ void net_onmessage(int fd, const unsigned char *msg, size_t size, int type)
 {
     char *cli;
     cli = ws_getaddress(fd);
-    printf("Received a message: '%s' (size: %zu, type: %d), from: %s/%d", msg, size,
+    printf("Received a message: '%s' (size: %zu, type: %d), from: %s/%d\n", msg, size,
               type, cli, fd);
     log_debug("Received a message: '%.*s' (size: %zu, type: %d), from: %s/%d and fd is %d", size - 1, msg, size,
               type, cli, fd, fd);
@@ -95,7 +92,7 @@ void net_onmessage(int fd, const unsigned char *msg, size_t size, int type)
 
     if (net_state == INIT) { /* Send the image frame to the client */
         net_state = RUNNING;
-        if (pthread_create(&aThread, NULL, send_frames, (void *)&fd) != 0) { /* Never returns */
+        if (pthread_create(&aThread, NULL, send_frames, (void *)fd) != 0) { /* Never returns */
             log_error("failed to create frame_server thread : %s", strerror(errno));
             net_state = ERR;
         };
