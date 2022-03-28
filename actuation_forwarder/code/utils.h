@@ -4,7 +4,7 @@
 #include <semaphore.h>
 #include "tco_shmem.h"
 
-extern struct tco_shmem_sem_control *shmem_actuation_data;
+extern struct tco_shmem_data_control *shmem_control_data;
 extern sem_t *shmem_control_sem;
 extern uint8_t shmem_control_open;
 
@@ -23,9 +23,11 @@ int shmem_cleanup();
 int shmem_init(int access_mode);
 
 /**
- * @brief Read the data from TCO_CONTROL_SHMEM
- * @return A copy of the current struct tco_shmem_sem_control 
+ * @brief Read or Write the data from TCO_CONTROL_SHMEM
+ * @param data is a ptr to write the data to
+ * @param dir is the direction to R/W. 0 is write @p data to shmem. else is read shmem into @p data
+ * @return void
  */
-struct tco_shmem_sem_control read_data(void);
+void get_or_set_data(struct tco_shmem_data_control *data, uint8_t dir);
 
 #endif /* _UTILS_H_ */

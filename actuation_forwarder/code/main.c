@@ -16,9 +16,9 @@ const int log_level = LOG_INFO | LOG_ERROR | LOG_DEBUG;
 void show_usage()
 {
 	printf("Allows actuation shmem to be shared over a network.\n"
-		   "Usage: tco_actuation_forwarder.bin < -c | -h > <port>\n"
-		   "'-h': host the actuation data (forwarder) \n"
-		   "'-c': client of acutation data (receiver) \n");
+		   "Usage: tco_actuation_forwarder.bin < -c | -h >\n"
+		   "'-h <port>': host the actuation data (forwarder) \n"
+		   "'-c <ip> <port>': client of actuation data (receiver) \n");
 }
 
 static void handle_stop(int sig)
@@ -48,7 +48,6 @@ static void register_stop_handler(void)
     sigaction(SIGTERM, &sa, NULL);
 }
 
-
 int main(int argc, char *argv[])
 {
 	if (log_init("actuation_forwarder", "./log.txt") != 0)
@@ -59,17 +58,13 @@ int main(int argc, char *argv[])
 
 	if (argc == 3 && strcmp("-h", argv[1]) == 0)
 	{
-		if (host_init(atoi(argv[2])) == 0)
-		{
-			host_start();
-		}
+		log_info("Started Host");
+		const int port = atoi(argv[2]);
+		host_start(port); /* never returns */
 	}
-	else if (argc == 3 && strcmp("-c", argv[1]) == 0)
+	else if (argc == 4 && strcmp("-c", argv[1]) == 0)
 	{
-		if (client_init(atoi(argv[2])) == 0)
-		{
-			client_start();
-		}
+		client_start(argv[2], atoi(argv[3])); /* never returns */
 	}
 	else
 	{

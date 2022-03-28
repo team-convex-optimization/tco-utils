@@ -1,8 +1,15 @@
 #ifndef _CLIENT_H_
 #define _CLIENT_H_
 
-int client_init(const int port);
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdlib.h>
 
-void client_start();
+#include "tco_shmem.h"
+#include "tco_libd.h"
+#include "utils.h"
+#include "toyws.h"
+
+void client_start(const char *ip, const int port);
 
 #endif /*_CLIENT_H_ */
