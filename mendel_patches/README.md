@@ -2,9 +2,9 @@
 
 In this directory, we present some patches to the mendel kernel/drivers to help things go a little smoother with this project. In case you get lazy, you can just apply the kernel we used (steps 4-7 of ov5645 section). The kernels update is left in the same directory of this readme.
 
-## ov5645 mipi 720@60fps
+## ov5645 mipi 720@60fps and 640x480@53fps
 
-For some reason, the ov5645 driver did not support the 720p@60fps. This is the exact sensor in the coral camera. This patch allows 720p@60fps without loss of other features (AE, AF, WB, etc).
+For some reason, the ov5645 driver did not support the 720p@60fps or VGA at more than 30. This is the exact sensor in the coral camera. This patch allows 720p@60fps and VGA@53fps without loss of other features (AE, AF, WB, etc). I could not get VGA at a higher fps...
 
 To install this, you will need to:
 1) Clone and build the Google Mendel Repository: https://coral.googlesource.com/docs/+/refs/heads/master/GettingStarted.md
