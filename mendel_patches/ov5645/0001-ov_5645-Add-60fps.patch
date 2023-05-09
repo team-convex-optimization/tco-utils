@@ -1,4 +1,4 @@
-From 499b2d0937f6f24980d02a21bf4ab22c25bd7906 Mon Sep 17 00:00:00 2001
+From 63a49ad43e82a9ad4aadd3ec050b512562fb9781 Mon Sep 17 00:00:00 2001
 From: Eduardo Lira <edulira@me.com>
 Date: Mon, 1 May 2023 22:46:10 +0200
 Subject: [PATCH] ov_5645: Add 60fps
@@ -7,12 +7,16 @@ Subject: [PATCH] ov_5645: Add 60fps
  - Add VGA@~53fps
 
 Change-Id: I71f27ad91385a82b876f67a968513755f74a2e7e
+
+Add autofocus and 60fps
+
+Change-Id: Ic5070cd82cbdf6a3d0a8d118bff1c8532fe34a14
 ---
- .../platform/mxc/capture/ov5645_mipi_v2.c     | 9125 +++++++++++++----
- 1 file changed, 6894 insertions(+), 2231 deletions(-)
+ .../platform/mxc/capture/ov5645_mipi_v2.c     | 9115 +++++++++++++----
+ 1 file changed, 6892 insertions(+), 2223 deletions(-)
 
 diff --git a/drivers/media/platform/mxc/capture/ov5645_mipi_v2.c b/drivers/media/platform/mxc/capture/ov5645_mipi_v2.c
-index ab8da9433a97..a33765c39613 100644
+index ab8da9433a97..8314b2e4e523 100644
 --- a/drivers/media/platform/mxc/capture/ov5645_mipi_v2.c
 +++ b/drivers/media/platform/mxc/capture/ov5645_mipi_v2.c
 @@ -27,22 +27,31 @@
@@ -6097,10 +6101,10 @@ index ab8da9433a97..a33765c39613 100644
 +	{0x3809, 0x80, 0, 0},
 +	{0x380a, 0x01, 0, 0},
 +	{0x380b, 0xe0, 0, 0},
-+	{0x380c, 0x06, 0, 0},
-+	{0x380d, 0x40, 0, 0},
++	{0x380c, 0x05, 0, 0},
++	{0x380d, 0xd8, 0, 0},
 +	{0x380e, 0x03, 0, 0},
-+	{0x380f, 0xe8, 0, 0},
++	{0x380f, 0xdf, 0, 0}, //b8 was 54fps
 +	{0x3810, 0x00, 0, 0},
 +	{0x3811, 0x10, 0, 0},
 +	{0x3812, 0x00, 0, 0},
@@ -9814,28 +9818,7 @@ index ab8da9433a97..a33765c39613 100644
  	case ov5645_af_release:
  		ov5645_release_af();
  		break;
-@@ -3515,18 +8146,12 @@ static int ov5645_read_af(char *buffer, struct kernel_param *kp)
- 	return cnt;
- }
- 
--static int ov5645_get_initialized(char *buffer, struct kernel_param *kp)
--{
--	int cnt;
--	cnt = sprintf(buffer, "%d", ov5645_data.initialized ? 1 : 0);
--	return cnt;
--}
--
-+/*
- module_param_call(ov5645_set_regs, ov5645_set_regs, NULL, NULL, 0644);
- module_param_call(ov5645_print_reg, ov5645_set_print_reg, ov5645_get_print_reg,
- 		NULL, 0644);
- module_param_call(ov5645_af, ov5645_set_af_mode, ov5645_read_af, NULL, 0644);
--module_param_call(ov5645_initialized, NULL, ov5645_get_initialized, NULL, 0644);
-+*/
- 
- /*!
-  * ov5645 I2C probe function
-@@ -3593,7 +8218,6 @@ static int ov5645_probe(struct i2c_client *client,
+@@ -3593,7 +8224,6 @@ static int ov5645_probe(struct i2c_client *client,
  
  	if (ov5645_data.mclk == OV5645_XCLK_20MHZ)
  		ov5645_adjust_setting_20mhz();
@@ -9843,7 +9826,7 @@ index ab8da9433a97..a33765c39613 100644
  	retval = of_property_read_u32(dev->of_node, "mclk_source",
  					(u32 *) &(ov5645_data.mclk_source));
  	if (retval) {
-@@ -3609,6 +8233,7 @@ static int ov5645_probe(struct i2c_client *client,
+@@ -3609,6 +8239,7 @@ static int ov5645_probe(struct i2c_client *client,
  	}
  
  	retval = of_property_read_u32(dev->of_node, "ae_target", &(AE_Target));
@@ -9851,7 +9834,7 @@ index ab8da9433a97..a33765c39613 100644
  	if (retval) {
  		dev_warn(dev,
  			 "ae_target missing in dev tree, using default %d\n",
-@@ -3616,7 +8241,6 @@ static int ov5645_probe(struct i2c_client *client,
+@@ -3616,7 +8247,6 @@ static int ov5645_probe(struct i2c_client *client,
  	}
  
  	clk_prepare_enable(ov5645_data.sensor_clk);
@@ -9859,7 +9842,7 @@ index ab8da9433a97..a33765c39613 100644
  	ov5645_data.io_init = ov5645_reset;
  	ov5645_data.i2c_client = client;
  	ov5645_data.pix.pixelformat = V4L2_PIX_FMT_YUYV;
-@@ -3627,20 +8251,19 @@ static int ov5645_probe(struct i2c_client *client,
+@@ -3627,20 +8257,19 @@ static int ov5645_probe(struct i2c_client *client,
  	ov5645_data.streamcap.capturemode = 0;
  	ov5645_data.streamcap.timeperframe.denominator = DEFAULT_FPS;
  	ov5645_data.streamcap.timeperframe.numerator = 1;
@@ -9883,7 +9866,7 @@ index ab8da9433a97..a33765c39613 100644
  	if (retval < 0 || chip_id_low != 0x45) {
  		pr_warning("camera ov5645_mipi is not found\n");
  		clk_disable_unprepare(ov5645_data.sensor_clk);
-@@ -3648,6 +8271,7 @@ static int ov5645_probe(struct i2c_client *client,
+@@ -3648,6 +8277,7 @@ static int ov5645_probe(struct i2c_client *client,
  	}
  
  	retval = init_device();
@@ -9891,7 +9874,7 @@ index ab8da9433a97..a33765c39613 100644
  	if (retval < 0) {
  		clk_disable_unprepare(ov5645_data.sensor_clk);
  		pr_warning("camera ov5645 init failed\n");
-@@ -3656,9 +8280,9 @@ static int ov5645_probe(struct i2c_client *client,
+@@ -3656,9 +8286,9 @@ static int ov5645_probe(struct i2c_client *client,
  	}
  
  	v4l2_i2c_subdev_init(&ov5645_data.subdev, client, &ov5645_subdev_ops);
@@ -9902,7 +9885,7 @@ index ab8da9433a97..a33765c39613 100644
  	if (retval < 0)
  		dev_err(&client->dev,
  					"%s--Async register failed, ret=%d\n", __func__, retval);
-@@ -3700,6 +8324,45 @@ static int ov5645_remove(struct i2c_client *client)
+@@ -3700,6 +8330,45 @@ static int ov5645_remove(struct i2c_client *client)
  	return 0;
  }
  
